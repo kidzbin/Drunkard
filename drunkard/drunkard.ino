@@ -17,6 +17,8 @@ unsigned int Cnt = 0;
 float        R0sum = 0;
 double       alcMAX = 0;
 
+double      RL = 2500;
+
 void setup() {
   Serial.begin(9600);
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
@@ -63,7 +65,8 @@ void GetAcl(void)
   display.setTextColor(WHITE);
 
   VolRs = GetVoltage();
-  R     = (5-VolRs)/VolRs;
+  //R     = (5-VolRs)/VolRs;
+  R      = RL*VolRs/(5-VolRs);
 
   Ratio = R / R0;
  
@@ -90,7 +93,8 @@ void GetR0(void)
   String str;
  
   VolRs = GetVoltage();
-  Rair  = (5-VolRs)/VolRs;
+  //Rair  = (5-VolRs)/VolRs;
+   Rair   = RL*VolRs/(5-VolRs);
   R0 = Rair/60.0;
   Cnt+=1;
   R0sum += R0;  
