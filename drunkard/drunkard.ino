@@ -17,7 +17,7 @@ unsigned int Cnt = 0;
 float        R0sum = 0;
 double       alcMAX = 0;
 
-double      RL = 2500;
+double      RL = 2400;
 
 void setup() {
   Serial.begin(9600);
@@ -49,7 +49,7 @@ void loop()
 void GetAcl(void)
 {
   double VolRs;
-  double R0=1.30,R;
+  double R0=1.3,R;
   double Ratio;
   double alc;
   String str;
@@ -65,8 +65,8 @@ void GetAcl(void)
   display.setTextColor(WHITE);
 
   VolRs = GetVoltage();
-  //R     = (5-VolRs)/VolRs;
-  R      = RL*VolRs/(5-VolRs);
+  R     = (5-VolRs)/VolRs;
+  //R      = RL*VolRs/(5-VolRs);
 
   Ratio = R / R0;
  
@@ -74,10 +74,11 @@ void GetAcl(void)
   if(alc > alcMAX)
     alcMAX = alc;
  
-  Serial.println(Ratio, 10);
-  Serial.println(alc , 10);
+  //Serial.println(Ratio, 10);
+  //Serial.println(alc , 10);
 
-  str = String(" ") + alc + String(" mg/L");
+  str = String(" ") + Ratio + String(",")  + alc + String(" mg/L");
+  Serial.println(str);
 
   display.println(str);
   display.display();
@@ -93,12 +94,12 @@ void GetR0(void)
   String str;
  
   VolRs = GetVoltage();
-  //Rair  = (5-VolRs)/VolRs;
-   Rair   = RL*VolRs/(5-VolRs);
+  Rair  = (5-VolRs)/VolRs;
+  //Rair   = RL*VolRs/(5-VolRs);
   R0 = Rair/60.0;
   Cnt+=1;
   R0sum += R0;  
-  str = String("") + R0 + String(", ") + R0sum/Cnt;
+  str = String("V=") + VolRs + String(", R=") + Rair+ String(", ") + R0 + String(", ") + R0sum/Cnt;
  
   Serial.println(str);
   //Serial.println(R0,4);
@@ -114,7 +115,7 @@ double GetVoltage(void)
 double CalAlcohol(double RRatio)
 {
   // f(x) = a * exp ( -b * x**c )
-  double a = 4444.52 , b = 9.18605 , c = 0.00643814;
+  double a = 4444.52 , b = 9.18605 , c = 0.0643814;
   double alc;
 
   alc = pow( (log(a)-log(RRatio))/b , 1/c );
