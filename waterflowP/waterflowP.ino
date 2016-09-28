@@ -62,7 +62,8 @@ void loop ()
   interrupts();    //Enables interrupts
 
   times = millis();
-  cnt++;
+  GetBeerFlow();
+
   ShowOnOLED();
   interval = millis()-times;
 
@@ -72,11 +73,13 @@ void loop ()
 
   beerflow.freq     = (double)NbTopsFan;
 
-//  if(cnt>=30)
-//  {
-//     cnt = 0;
-//     beerflow.totalml = 0;
-//  }
+  if(beerflow.freq==0) cnt++;
+
+  if(cnt>=30)
+  {
+     cnt = 0;
+     beerflow.totalml = 0;
+  }
 
 }
 
@@ -93,7 +96,7 @@ void ShowOnOLED(void)
   display.println("  ");
   display.setTextSize(2);
   display.setTextColor(WHITE);
-  str = String(" ") + (int)beerflow.totalml + String("ml"); 
+  str = String("   ") + (int)beerflow.totalml + String("ml"); 
   display.print(str);
   display.display();
   /* ----------------------------------------*/
@@ -102,8 +105,8 @@ void ShowOnOLED(void)
 void GetBeerFlow(void)
 {
   String str;
-
-  beerflow.flowrate = ((double)beerflow.freq/4380)*1000;
+  if(beerflow.freq) beerflow.freq+=4;
+  beerflow.flowrate = (((double)beerflow.freq)/4380)*1000;
   beerflow.totalml += beerflow.flowrate;
   str = String("Freq:") + beerflow.freq + String(" Rate:") + beerflow.flowrate +  String(" ml/s ") + String("Total:") +  beerflow.totalml;
   Serial.println(str);
