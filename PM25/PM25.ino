@@ -36,11 +36,12 @@ typedef struct
 
 _stPMS5003 AirData;
 
+unsigned int cnt = 0;
  
 void setup()
 {
   Serial.begin(9600);   //use serial0
-  Serial.setTimeout(1500);    //set the Timeout to 1500ms, longer than the data transmission periodic time of the sensor
+  Serial.setTimeout(1000);    //set the Timeout to 1500ms, longer than the data transmission periodic time of the sensor
 
   /* -- Initial LCD -- */
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
@@ -52,10 +53,6 @@ void setup()
   display.setCursor(0,0);
   display.println("Booting");
   display.println("  ");
-  //display.setTextSize(2);
-  //display.setTextColor(WHITE);
-  //str = String("   ") + (int)beerflow.totalml + String("ml"); 
-  //display.print(str);
   display.display();
   /* ----------------------------------------*/
   
@@ -66,18 +63,16 @@ void loop()
 {
   String str;
 
-  if(Serial.find(0x42)){    //start to read when detect 0x42
+  if(Serial.find(0x42)) //start to read when detect 0x42
+  {
     Serial.readBytes(buf,LENG);
  
-    if(buf[0] == 0x4d){
+    if(buf[0] == 0x4d)
+    {
       if(checkValue(buf,LENG))
       {
         GetData(buf);
-        //Serial.println("Show :");
-        //Serial.println(AirData.PM01Value);
-        //Serial.println(AirData.PM2_5Value);
-        //Serial.println(AirData.PM10Value);
-        //Serial.println((double)AirData.HCHO/1000);
+        cnt++;
       }        
     }
   }
@@ -110,7 +105,7 @@ void loop()
       display.setTextSize(1);
       display.setTextColor(WHITE);
       display.setCursor(0,0);
-      display.println("PM2.5 Detection");
+      display.println(String("PM2.5 Detection ") + cnt%10000);
 
       str = String("PM1.0: ") + AirData.PM01Value + String(" PM2.5: ") + AirData.PM2_5Value;
       display.println(str);
@@ -118,9 +113,10 @@ void loop()
       display.println(str);
       str = String("HCHO : ") + (double)AirData.HCHO/1000;
       display.println(str);      
-      display.display();      
+      display.display();
+
     }
-   
+
 }
 
 void GetData(unsigned char *thebuf)
@@ -146,12 +142,6 @@ char checkValue(unsigned char *thebuf, char leng)
 {  
   char receiveflag=0;
   int receiveSum=0;
-
-//  for(int i=0;i<leng;i++)
-//  {
-//    Serial.print(thebuf[i],HEX);
-//    Serial.print(" ");
-//  }
   
   for(int i=0; i<(leng-2); i++){
   receiveSum=receiveSum+thebuf[i];
