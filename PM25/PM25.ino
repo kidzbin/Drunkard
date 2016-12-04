@@ -1,6 +1,6 @@
 
-#include <SPI.h>
-#include <Wire.h>
+//#include <SPI.h>
+//#include <Wire.h>
 #include <math.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -69,6 +69,7 @@ void loop()
  
     if(buf[0] == 0x4d)
     {
+       Serial.print("get data");  
       if(checkValue(buf,LENG))
       {
         GetData(buf);
@@ -81,7 +82,8 @@ void loop()
   if (millis() - OledTimer >=1000) 
   {
       OledTimer=millis(); 
-       
+
+      Serial.println(cnt);    
       Serial.print("PM1.0: ");  
       Serial.print(AirData.PM01Value);
       Serial.println("  ug/m3");            
@@ -95,6 +97,7 @@ void loop()
       Serial.println("  ug/m3");
 
       Serial.print("HCHO: ");  
+      Serial.print(AirData.HCHO);Serial.println("  ");  
       Serial.print((double)AirData.HCHO/1000);
       Serial.println("  mg/m3");  
 
@@ -105,14 +108,21 @@ void loop()
       display.setTextSize(1);
       display.setTextColor(WHITE);
       display.setCursor(0,0);
-      display.println(String("PM2.5 Detection ") + cnt%10000);
+
+      if( ((cnt/2)&0x01) == 0x00)
+        display.println(String("PM2.5 Detection  "));
+      else
+        display.println(String("PM2.5 Detection  *"));
+
+      //display.println(String("PM2.5 Detection ") + (cnt&0x01));
+//      display.println(String("PM2.5 Detection ") );
 
       str = String("PM1.0: ") + AirData.PM01Value + String(" PM2.5: ") + AirData.PM2_5Value;
       display.println(str);
       str = String("PM 10: ") + AirData.PM10Value;
       display.println(str);
-      str = String("HCHO : ") + (double)AirData.HCHO/1000;
-      display.println(str);      
+     // str = String("HCHO : ") + (double)AirData.HCHO/1000;
+     // display.println(str);      
       display.display();
 
     }
@@ -136,6 +146,11 @@ void GetData(unsigned char *thebuf)
   AirData.Air50       = ((thebuf[20]<<8) + thebuf[21]);
   AirData.Air100      = ((thebuf[22]<<8) + thebuf[23]);
   AirData.HCHO        = ((thebuf[24]<<8) + thebuf[25]);
+
+ // Serial.print("debug");
+ // Serial.println(thebuf[24]);  
+ // Serial.println(thebuf[25]);
+  
 }
 
 char checkValue(unsigned char *thebuf, char leng)

@@ -10,11 +10,11 @@ extern "C" {
 }
 
 const char* host = "api.thingspeak.com"; // Your domain  
-String ApiKey = "CQ85TFFBN74R6WRD";
-String path = "/update?key=" + ApiKey + "&field1=";  
+String ApiKey = "SWS4VGTFOGMVAWI6";
+String path = "/update?key=" + ApiKey;
 
-const char* ssid = "Elida";
-const char* pass = "999999999";
+const char* ssid = "Bin";
+const char* pass = "77777777";
 
 os_timer_t ESP8266Timer;
 
@@ -162,7 +162,12 @@ void loop() {
       return;
     }
 
-    client.print(String("GET ") + path + str + "&field2=" + Temp + " HTTP/1.1\r\n" +
+    client.print(String("GET ") + path 
+             + "&field1=" + CO2
+             + "&field2=" + Temp 
+             + "&field3=" + Humi
+             + "&field4=" + AirPre
+             + " HTTP/1.1\r\n" +
              "Host: " + host + "\r\n" + 
              "Connection: keep-alive\r\n\r\n");
      
